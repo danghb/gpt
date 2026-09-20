@@ -16,6 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
+    private static final String DEFAULT_TEST_URI = "https://wxaurl.cn/9JHGjdJl7fd";
+
     private SharedPreferences prefs;
     private EditText uriEdit;
     private TextView status;
@@ -41,7 +43,7 @@ public class MainActivity extends Activity {
         root.addView(title);
 
         TextView info = new TextView(this);
-        info.setText("模拟标准 NFC Forum Type 4 NDEF 标签：\nURI Record + 微信 AAR (com.tencent.mm)\n\n粘贴微信 generateNFCScheme 返回的 openlink，或 HTTPS 小程序 URL Link。");
+        info.setText("已内置测试链接：Kimi 智能助手\n\n模拟标准 NFC Forum Type 4 NDEF 标签：\nURI Record + 微信 AAR (com.tencent.mm)\n\n也可以直接改成你自己的微信 URL Link。");
         info.setTextSize(15);
         info.setPadding(0, dp(14), 0, dp(14));
         root.addView(info);
@@ -51,7 +53,13 @@ public class MainActivity extends Activity {
         uriEdit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         uriEdit.setSingleLine(false);
         uriEdit.setMinLines(3);
-        uriEdit.setText(prefs.getString("uri", ""));
+
+        String savedUri = prefs.getString("uri", "");
+        if (savedUri == null || savedUri.trim().isEmpty()) {
+            savedUri = DEFAULT_TEST_URI;
+        }
+        uriEdit.setText(savedUri);
+
         root.addView(uriEdit, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -70,7 +78,7 @@ public class MainActivity extends Activity {
         root.addView(status);
 
         TextView tip = new TextView(this);
-        tip.setText("测试：保持本应用在前台、屏幕亮着，把另一台 Android 或 iPhone 靠近本机 NFC 天线。iPhone 识别后通常会先弹系统通知，点通知再进入。\n\n若 iPhone 对 weixin:// 没反应，改用微信生成的 HTTPS URL Link 测试。");
+        tip.setText("直接点击“开始模拟”，再用另一台 Android 或 iPhone 靠近本机 NFC 天线。\n\n当前默认地址：Kimi 智能助手。");
         tip.setTextSize(13);
         tip.setPadding(0, dp(18), 0, 0);
         root.addView(tip);
@@ -106,7 +114,7 @@ public class MainActivity extends Activity {
 
         String uri = uriEdit.getText().toString().trim();
         if (uri.isEmpty()) {
-            Toast.makeText(this, "先粘贴小程序链接", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "先输入小程序链接", Toast.LENGTH_SHORT).show();
             return;
         }
         if (!uri.contains("://")) {
@@ -147,7 +155,7 @@ public class MainActivity extends Activity {
         }
 
         if (enabled) {
-            String uri = prefs.getString("uri", "");
+            String uri = prefs.getString("uri", DEFAULT_TEST_URI);
             status.setText("状态：正在模拟\n" + uri);
             toggleButton.setText("停止模拟");
         } else {
