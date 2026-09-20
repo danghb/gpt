@@ -9,3 +9,5 @@
 4. 用另一台 Android 或 iPhone 靠近测试。
 
 GitHub Actions 会自动构建 Debug APK，产物名：`WeChatNfcHce-debug-apk`。
+
+> build/test-apk 分支用于触发首次云端构建验证。
