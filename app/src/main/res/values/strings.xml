@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="service_desc">NFC Forum Type 4 NDEF 标签模拟</string>
+    <string name="aid_group_desc">NDEF Tag Application</string>
+</resources>
