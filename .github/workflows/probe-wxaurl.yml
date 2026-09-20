@@ -12,36 +12,31 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe candidate links
+      - name: Probe live links on Android and iPhone UAs
         shell: bash
         run: |
           set +e
           urls=(
-            "https://wxaurl.cn/tIhrCxgH5Kb"
-            "https://wxaurl.cn/UOdOAJrVwan"
             "https://wxaurl.cn/k9RqtoN7hJr"
             "https://wxaurl.cn/IhB2TOvurDv"
-            "https://wxaurl.cn/YcKvT6jRmzv"
-            "https://wxaurl.cn/xEoLSZ0xJIc"
-            "https://wxaurl.cn/7RlpqGHfQ8h"
-            "https://wxaurl.cn/M0qyMy2ArXo"
-            "https://wxaurl.cn/rB6aPDnl95r"
             "https://wxaurl.cn/9JHGjdJl7fd"
             "https://wxaurl.cn/LOT7BAoWd6c"
             "https://wxaurl.cn/bg5JW99T7rm"
-            "https://wxaurl.cn/K5TeBdt2dtn"
-            "https://wxaurl.cn/In58pu1KAZb"
           )
+
+          declare -A uas
+          uas[android]='Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/140.0 Mobile Safari/537.36'
+          uas[iphone]='Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'
+
           for u in "${urls[@]}"; do
-            echo "===== $u ====="
-            rm -f /tmp/h /tmp/b
-            curl -A "Mozilla/5.0 (Linux; Android 14)"               --connect-timeout 8 --max-time 20               -sS -L -D /tmp/h -o /tmp/b               -w "http_code=%{http_code}\nurl_effective=%{url_effective}\nremote_ip=%{remote_ip}\ncontent_type=%{content_type}\nredirects=%{num_redirects}\n"               "$u"
-            rc=$?
-            echo "curl_rc=$rc"
-            echo "--- headers tail ---"
-            tail -n 20 /tmp/h 2>/dev/null
-            echo "--- body preview ---"
-            head -c 800 /tmp/b 2>/dev/null | tr '\n' ' '
-            echo
-            echo
+            for platform in android iphone; do
+              echo "===== $platform $u ====="
+              rm -f /tmp/h /tmp/b
+              curl -A "${uas[$platform]}"                 --connect-timeout 8 --max-time 20                 -sS -L -D /tmp/h -o /tmp/b                 -w "http_code=%{http_code}\nurl_effective=%{url_effective}\ncontent_type=%{content_type}\nredirects=%{num_redirects}\n"                 "$u"
+              echo "title=$(grep -oP 'apple-mobile-web-app-title" content="\K[^"]+' /tmp/b | head -1)"
+              echo "expired=$(grep -c 'link_expired' /tmp/b)"
+              echo "noaccess=$(grep -c '当前页面无法访问' /tmp/b)"
+              echo "weixin_scheme=$(grep -oE 'weixin://[^"[:space:]<>]+' /tmp/b | head -1)"
+              echo
+            done
           done
