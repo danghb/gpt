@@ -29,7 +29,7 @@ public class NfcProtocolTest {
 
         assertEquals(0x54, ndef[p++] & 0xFF);
         int typeLen2 = ndef[p++] & 0xFF;
-        int payloadLen2 = ndef[p++] & 0xFF);
+        int payloadLen2 = ndef[p++] & 0xFF;
 
         assertEquals("android.com:pkg",
                 new String(ndef, p, typeLen2, StandardCharsets.US_ASCII));
