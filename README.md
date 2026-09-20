@@ -8,4 +8,4 @@
 3. 点击“开始模拟”，保持 App 前台、屏幕亮着。
 4. 用另一台 Android 或 iPhone 靠近测试。
 
-GitHub Actions 会自动构建 Debug APK，产物名：`WeChatNfcHce-debug-apk`。
+GitHub Actions 会自动构建 Debug APK，产物名：`WeChatNfcHce-debug-apk`。\n\n正式下载请优先使用仓库 Releases 中的 `WeChatNfcHce-v1.0.0.apk`。
