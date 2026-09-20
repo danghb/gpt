@@ -4,8 +4,10 @@
 
 ## 使用
 1. Android 手机支持 NFC + HCE。
-2. 安装 APK，输入微信 NFC openlink 或 HTTPS 小程序 URL Link。
-3. 点击“开始模拟”，保持 App 前台、屏幕亮着。
-4. 用另一台 Android 或 iPhone 靠近测试。
+2. v1.0.1 已内置当前可访问的 Kimi 小程序 URL Link：`https://wxaurl.cn/9JHGjdJl7fd`。
+3. 安装后可以直接点击“开始模拟”，也可以把输入框改成你自己的微信 URL Link。
+4. 保持 App 前台、屏幕亮着，用另一台 Android 或 iPhone 靠近测试。
 
-GitHub Actions 会自动构建 Debug APK，产物名：`WeChatNfcHce-debug-apk`。\n\n正式下载请优先使用仓库 Releases 中的 `WeChatNfcHce-v1.0.0.apk`。
+GitHub Actions 会先跑 NFC 协议单元测试，再构建 APK。
+
+正式下载请使用 Releases 中的 `WeChatNfcHce-v1.0.1.apk`。
