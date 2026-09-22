@@ -43,20 +43,24 @@ public class MainActivity extends Activity {
         root.addView(title);
 
         TextView info = new TextView(this);
-        info.setText("已内置 NFC Scheme 测试样本\n\n按照微信 NFC 文档模拟：\nURI Record + 微信 AAR (com.tencent.mm)\n\n默认值来自 2026-04-24 公开的 generateNFCScheme 实战记录，也可以直接替换成你自己的 NFC Scheme。");
+        info.setText("兼容两种测试模式：\n"
+                + "1. weixin:// NFC Scheme（微信官方 NFC 场景）\n"
+                + "2. http:// / https:// 普通 NDEF URL\n\n"
+                + "两种模式都使用 URI Record + 微信 AAR (com.tencent.mm)。");
         info.setTextSize(15);
         info.setPadding(0, dp(14), 0, dp(14));
         root.addView(info);
 
         uriEdit = new EditText(this);
-        uriEdit.setHint("weixin://dl/business/?t=...");
-        uriEdit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        uriEdit.setHint("weixin://... 或 https://... 或 http://...");
+        uriEdit.setInputType(InputType.TYPE_CLASS_TEXT
+                | InputType.TYPE_TEXT_VARIATION_URI
+                | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         uriEdit.setSingleLine(false);
         uriEdit.setMinLines(3);
 
         String savedUri = prefs.getString("uri", "");
-        if (savedUri == null || savedUri.trim().isEmpty()
-                || savedUri.startsWith("https://wxaurl.cn/")) {
+        if (savedUri == null || savedUri.trim().isEmpty()) {
             savedUri = DEFAULT_TEST_URI;
         }
         uriEdit.setText(savedUri);
@@ -79,7 +83,8 @@ public class MainActivity extends Activity {
         root.addView(status);
 
         TextView tip = new TextView(this);
-        tip.setText("直接点击“开始模拟”，再用另一台 Android 或 iPhone 靠近本机 NFC 天线。\n\n默认 Scheme：weixin://dl/business/?t=B6pHVrURvPk");
+        tip.setText("新安装默认使用 NFC Scheme。\n"
+                + "需要测试普通网页/URL Link 时，直接输入 http:// 或 https:// 地址即可。");
         tip.setTextSize(13);
         tip.setPadding(0, dp(18), 0, 0);
         root.addView(tip);
@@ -97,7 +102,8 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
-        if (nfcAdapter != null && getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)) {
+        if (nfcAdapter != null
+                && getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)) {
             try {
                 CardEmulation.getInstance(nfcAdapter).unsetPreferredService(this);
             } catch (Exception ignored) {}
@@ -115,15 +121,25 @@ public class MainActivity extends Activity {
 
         String uri = uriEdit.getText().toString().trim();
         if (uri.isEmpty()) {
-            Toast.makeText(this, "先输入 NFC Scheme", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (!uri.startsWith("weixin://")) {
-            Toast.makeText(this, "微信 NFC 应使用 weixin:// URL Scheme", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "先输入 URI", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        prefs.edit().putString("uri", uri).putBoolean("enabled", true).apply();
+        String lower = uri.toLowerCase();
+        if (!(lower.startsWith("weixin://")
+                || lower.startsWith("http://")
+                || lower.startsWith("https://"))) {
+            Toast.makeText(this,
+                    "仅支持 weixin://、http:// 或 https://",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        prefs.edit()
+                .putString("uri", uri)
+                .putBoolean("enabled", true)
+                .apply();
+
         preferServiceIfNeeded();
         refreshUi();
     }
@@ -132,13 +148,15 @@ public class MainActivity extends Activity {
         if (!prefs.getBoolean("enabled", false)) return;
         if (nfcAdapter == null || !nfcAdapter.isEnabled()) return;
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)) return;
+
         try {
             CardEmulation.getInstance(nfcAdapter).setPreferredService(this, serviceComponent);
         } catch (Exception ignored) {}
     }
 
     private void refreshUi() {
-        boolean hce = getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION);
+        boolean hce = getPackageManager()
+                .hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION);
         boolean enabled = prefs.getBoolean("enabled", false);
 
         if (nfcAdapter == null || !hce) {
@@ -149,6 +167,7 @@ public class MainActivity extends Activity {
         }
 
         toggleButton.setEnabled(true);
+
         if (!nfcAdapter.isEnabled()) {
             status.setText("状态：NFC 未开启，请先在系统设置里打开 NFC");
             toggleButton.setText(enabled ? "停止模拟" : "开始模拟");

@@ -1,30 +1,34 @@
 # WeChat NFC HCE Test
 
-Android HCE 模拟 **NFC Forum Type 4 NDEF Tag**，用于验证微信官方“NFC 标签打开小程序”流程。
+Android HCE 模拟 **NFC Forum Type 4 NDEF Tag**。
 
-## v1.0.2
+## v1.0.3
 
-默认测试值：
+支持三种 URI：
+
+```
+weixin://...
+https://...
+http://...
+```
+
+新安装默认仍使用微信 NFC Scheme 测试样本：
 
 ```
 weixin://dl/business/?t=B6pHVrURvPk
 ```
 
-该 Scheme 来自 2026-04-24 的公开 `generateNFCScheme` 实战记录；同一记录中包含真实 `model_id`、`sn` 和 NFC Scheme 生成参数。它比普通 `https://wxaurl.cn/...` URL Link 更符合微信 NFC 官方文档要求。
+但 HTTP/HTTPS 功能完整保留，升级时也不会再强制替换之前保存的 URL。
 
-> 这是公开测试样本，无法在无微信实机的情况下确认其当前服务端业务状态。最终仍以真机 NFC + 微信测试为准。
+### 模式说明
 
-## 模拟格式
+- `weixin://...`
+  - 用于微信官方“NFC 标签打开小程序”场景
+  - URI Record + 微信 AAR
+- `http://...` / `https://...`
+  - 用于普通 NDEF URL、URL Link、网页跳转测试
+  - 同样使用 URI Record + 微信 AAR
 
-- URI Record
-  - TNF: `0x01`
-  - Type: `U`
-  - Payload: `weixin://...` NFC Scheme
-- Android Application Record
-  - TNF: `0x04`
-  - Type: `android.com:pkg`
-  - Payload: `com.tencent.mm`
+GitHub Actions 会分别测试 `weixin://`、`https://` 和 `http://` 的 NDEF 编码，再构建 APK。
 
-GitHub Actions 会先跑 NFC/NDEF/APDU 协议单元测试，再构建 APK。
-
-正式下载：Releases → `WeChatNfcHce-v1.0.2.apk`
+正式下载：Releases → `WeChatNfcHce-v1.0.3.apk`

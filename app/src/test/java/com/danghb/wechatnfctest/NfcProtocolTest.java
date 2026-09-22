@@ -9,37 +9,22 @@ import org.junit.Test;
 
 public class NfcProtocolTest {
     private static final String TEST_SCHEME = "weixin://dl/business/?t=B6pHVrURvPk";
+    private static final String TEST_HTTPS = "https://wxaurl.cn/test";
+    private static final String TEST_HTTP = "http://example.com/test";
 
     @Test
     public void ndefContainsWechatSchemeAndWechatAar() {
-        byte[] ndef = NdefBuilder.build(TEST_SCHEME);
+        assertNdefUriAndAar(TEST_SCHEME);
+    }
 
-        int p = 0;
+    @Test
+    public void ndefSupportsHttpsUrlAndWechatAar() {
+        assertNdefUriAndAar(TEST_HTTPS);
+    }
 
-        assertEquals(0x91, ndef[p++] & 0xFF);
-        int typeLen1 = ndef[p++] & 0xFF;
-        int payloadLen1 = ndef[p++] & 0xFF;
-        assertEquals(1, typeLen1);
-        assertEquals('U', ndef[p++] & 0xFF);
-        assertEquals(0x00, ndef[p++] & 0xFF);
-
-        byte[] uriBytes = Arrays.copyOfRange(ndef, p, p + payloadLen1 - 1);
-        assertEquals(TEST_SCHEME, new String(uriBytes, StandardCharsets.UTF_8));
-        p += payloadLen1 - 1;
-
-        assertEquals(0x54, ndef[p++] & 0xFF);
-        int typeLen2 = ndef[p++] & 0xFF;
-        int payloadLen2 = ndef[p++] & 0xFF;
-
-        assertEquals("android.com:pkg",
-                new String(ndef, p, typeLen2, StandardCharsets.US_ASCII));
-        p += typeLen2;
-
-        assertEquals("com.tencent.mm",
-                new String(ndef, p, payloadLen2, StandardCharsets.US_ASCII));
-        p += payloadLen2;
-
-        assertEquals(ndef.length, p);
+    @Test
+    public void ndefSupportsHttpUrlAndWechatAar() {
+        assertNdefUriAndAar(TEST_HTTP);
     }
 
     @Test
@@ -83,6 +68,36 @@ public class NfcProtocolTest {
         Type4NdefEngine engine = new Type4NdefEngine();
         assertArrayEquals(hex("6A82"),
                 engine.process(hex("00A4040007D276000085010100"), new byte[0], false));
+    }
+
+    private static void assertNdefUriAndAar(String uri) {
+        byte[] ndef = NdefBuilder.build(uri);
+        int p = 0;
+
+        assertEquals(0x91, ndef[p++] & 0xFF);
+        int typeLen1 = ndef[p++] & 0xFF;
+        int payloadLen1 = ndef[p++] & 0xFF;
+        assertEquals(1, typeLen1);
+        assertEquals('U', ndef[p++] & 0xFF);
+        assertEquals(0x00, ndef[p++] & 0xFF);
+
+        byte[] uriBytes = Arrays.copyOfRange(ndef, p, p + payloadLen1 - 1);
+        assertEquals(uri, new String(uriBytes, StandardCharsets.UTF_8));
+        p += payloadLen1 - 1;
+
+        assertEquals(0x54, ndef[p++] & 0xFF);
+        int typeLen2 = ndef[p++] & 0xFF;
+        int payloadLen2 = ndef[p++] & 0xFF;
+
+        assertEquals("android.com:pkg",
+                new String(ndef, p, typeLen2, StandardCharsets.US_ASCII));
+        p += typeLen2;
+
+        assertEquals("com.tencent.mm",
+                new String(ndef, p, payloadLen2, StandardCharsets.US_ASCII));
+        p += payloadLen2;
+
+        assertEquals(ndef.length, p);
     }
 
     private static byte[] hex(String s) {
