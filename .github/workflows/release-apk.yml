@@ -34,20 +34,20 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Prepare APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk WeChatNfcHce-v1.0.4.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk WeChatNfcHce-v1.0.5.apk
 
       - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="v1.0.4"
-          APK="WeChatNfcHce-v1.0.4.apk"
+          TAG="v1.0.5"
+          APK="WeChatNfcHce-v1.0.5.apk"
 
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" --clobber
           else
             gh release create "$TAG" "$APK" \
               --target "$GITHUB_SHA" \
-              --title "WeChat NFC HCE v1.0.4" \
-              --notes "兼容 weixin:// NFC Scheme 与 http:// / https:// 普通 NDEF URL；默认 Scheme 更新为 QDZVQEO2z9f。"
+              --title "WeChat NFC HCE v1.0.5" \
+              --notes "新增实体 NFC 卡写入与读回校验；支持已格式化 NDEF 卡和可格式化空白卡；不锁卡、不设只读。"
           fi
