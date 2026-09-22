@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
-    private static final String DEFAULT_TEST_URI = "weixin://dl/business/?t=B6pHVrURvPk";
+    private static final String DEFAULT_TEST_URI = "weixin://dl/business/?t=QDZVQEO2z9f";
 
     private SharedPreferences prefs;
     private EditText uriEdit;
@@ -60,7 +60,8 @@ public class MainActivity extends Activity {
         uriEdit.setMinLines(3);
 
         String savedUri = prefs.getString("uri", "");
-        if (savedUri == null || savedUri.trim().isEmpty()) {
+        if (savedUri == null || savedUri.trim().isEmpty()
+                || savedUri.equals("weixin://dl/business/?t=B6pHVrURvPk")) {
             savedUri = DEFAULT_TEST_URI;
         }
         uriEdit.setText(savedUri);

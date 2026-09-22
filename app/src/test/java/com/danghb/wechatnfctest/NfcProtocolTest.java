@@ -8,7 +8,7 @@ import java.util.Arrays;
 import org.junit.Test;
 
 public class NfcProtocolTest {
-    private static final String TEST_SCHEME = "weixin://dl/business/?t=B6pHVrURvPk";
+    private static final String TEST_SCHEME = "weixin://dl/business/?t=QDZVQEO2z9f";
     private static final String TEST_HTTPS = "https://wxaurl.cn/test";
     private static final String TEST_HTTP = "http://example.com/test";
 
