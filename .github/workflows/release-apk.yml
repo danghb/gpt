@@ -34,17 +34,20 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Prepare APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk WeChatNfcHce-v1.0.1.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk WeChatNfcHce-v1.0.2.apk
 
       - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="v1.0.1"
-          APK="WeChatNfcHce-v1.0.1.apk"
+          TAG="v1.0.2"
+          APK="WeChatNfcHce-v1.0.2.apk"
 
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" --clobber
           else
-            gh release create "$TAG" "$APK"               --target "$GITHUB_SHA"               --title "WeChat NFC HCE v1.0.1"               --notes "内置可用 Kimi 小程序 URL Link，打开即可直接测试 NFC 拉起小程序。"
+            gh release create "$TAG" "$APK" \
+              --target "$GITHUB_SHA" \
+              --title "WeChat NFC HCE v1.0.2" \
+              --notes "按微信 NFC 官方格式模拟 URI Record + 微信 AAR；默认内置 2026-04-24 公开 generateNFCScheme 实战样本。"
           fi

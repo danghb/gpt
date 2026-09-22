@@ -8,11 +8,11 @@ import java.util.Arrays;
 import org.junit.Test;
 
 public class NfcProtocolTest {
+    private static final String TEST_SCHEME = "weixin://dl/business/?t=B6pHVrURvPk";
 
     @Test
-    public void ndefContainsUriAndWechatAar() {
-        String uri = "https://wxaurl.cn/test";
-        byte[] ndef = NdefBuilder.build(uri);
+    public void ndefContainsWechatSchemeAndWechatAar() {
+        byte[] ndef = NdefBuilder.build(TEST_SCHEME);
 
         int p = 0;
 
@@ -24,7 +24,7 @@ public class NfcProtocolTest {
         assertEquals(0x00, ndef[p++] & 0xFF);
 
         byte[] uriBytes = Arrays.copyOfRange(ndef, p, p + payloadLen1 - 1);
-        assertEquals(uri, new String(uriBytes, StandardCharsets.UTF_8));
+        assertEquals(TEST_SCHEME, new String(uriBytes, StandardCharsets.UTF_8));
         p += payloadLen1 - 1;
 
         assertEquals(0x54, ndef[p++] & 0xFF);
@@ -44,7 +44,7 @@ public class NfcProtocolTest {
 
     @Test
     public void type4ReadSequenceReturnsNdefFile() {
-        byte[] ndef = NdefBuilder.build("https://wxaurl.cn/test");
+        byte[] ndef = NdefBuilder.build(TEST_SCHEME);
         Type4NdefEngine engine = new Type4NdefEngine();
 
         assertArrayEquals(hex("9000"),

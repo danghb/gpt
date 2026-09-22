@@ -1,13 +1,30 @@
 # WeChat NFC HCE Test
 
-一个最小 Android HCE 测试 App：把 Android 手机模拟成 **NFC Forum Type 4 NDEF Tag**，用于测试 NFC 拉起微信小程序。
+Android HCE 模拟 **NFC Forum Type 4 NDEF Tag**，用于验证微信官方“NFC 标签打开小程序”流程。
 
-## 使用
-1. Android 手机支持 NFC + HCE。
-2. v1.0.1 已内置当前可访问的 Kimi 小程序 URL Link：`https://wxaurl.cn/9JHGjdJl7fd`。
-3. 安装后可以直接点击“开始模拟”，也可以把输入框改成你自己的微信 URL Link。
-4. 保持 App 前台、屏幕亮着，用另一台 Android 或 iPhone 靠近测试。
+## v1.0.2
 
-GitHub Actions 会先跑 NFC 协议单元测试，再构建 APK。
+默认测试值：
 
-正式下载请使用 Releases 中的 `WeChatNfcHce-v1.0.1.apk`。
+```
+weixin://dl/business/?t=B6pHVrURvPk
+```
+
+该 Scheme 来自 2026-04-24 的公开 `generateNFCScheme` 实战记录；同一记录中包含真实 `model_id`、`sn` 和 NFC Scheme 生成参数。它比普通 `https://wxaurl.cn/...` URL Link 更符合微信 NFC 官方文档要求。
+
+> 这是公开测试样本，无法在无微信实机的情况下确认其当前服务端业务状态。最终仍以真机 NFC + 微信测试为准。
+
+## 模拟格式
+
+- URI Record
+  - TNF: `0x01`
+  - Type: `U`
+  - Payload: `weixin://...` NFC Scheme
+- Android Application Record
+  - TNF: `0x04`
+  - Type: `android.com:pkg`
+  - Payload: `com.tencent.mm`
+
+GitHub Actions 会先跑 NFC/NDEF/APDU 协议单元测试，再构建 APK。
+
+正式下载：Releases → `WeChatNfcHce-v1.0.2.apk`

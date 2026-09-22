@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
-    private static final String DEFAULT_TEST_URI = "https://wxaurl.cn/9JHGjdJl7fd";
+    private static final String DEFAULT_TEST_URI = "weixin://dl/business/?t=B6pHVrURvPk";
 
     private SharedPreferences prefs;
     private EditText uriEdit;
@@ -43,19 +43,20 @@ public class MainActivity extends Activity {
         root.addView(title);
 
         TextView info = new TextView(this);
-        info.setText("已内置测试链接：Kimi 智能助手\n\n模拟标准 NFC Forum Type 4 NDEF 标签：\nURI Record + 微信 AAR (com.tencent.mm)\n\n也可以直接改成你自己的微信 URL Link。");
+        info.setText("已内置 NFC Scheme 测试样本\n\n按照微信 NFC 文档模拟：\nURI Record + 微信 AAR (com.tencent.mm)\n\n默认值来自 2026-04-24 公开的 generateNFCScheme 实战记录，也可以直接替换成你自己的 NFC Scheme。");
         info.setTextSize(15);
         info.setPadding(0, dp(14), 0, dp(14));
         root.addView(info);
 
         uriEdit = new EditText(this);
-        uriEdit.setHint("例如：https://wxaurl.cn/... 或 weixin://...");
+        uriEdit.setHint("weixin://dl/business/?t=...");
         uriEdit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         uriEdit.setSingleLine(false);
         uriEdit.setMinLines(3);
 
         String savedUri = prefs.getString("uri", "");
-        if (savedUri == null || savedUri.trim().isEmpty()) {
+        if (savedUri == null || savedUri.trim().isEmpty()
+                || savedUri.startsWith("https://wxaurl.cn/")) {
             savedUri = DEFAULT_TEST_URI;
         }
         uriEdit.setText(savedUri);
@@ -78,7 +79,7 @@ public class MainActivity extends Activity {
         root.addView(status);
 
         TextView tip = new TextView(this);
-        tip.setText("直接点击“开始模拟”，再用另一台 Android 或 iPhone 靠近本机 NFC 天线。\n\n当前默认地址：Kimi 智能助手。");
+        tip.setText("直接点击“开始模拟”，再用另一台 Android 或 iPhone 靠近本机 NFC 天线。\n\n默认 Scheme：weixin://dl/business/?t=B6pHVrURvPk");
         tip.setTextSize(13);
         tip.setPadding(0, dp(18), 0, 0);
         root.addView(tip);
@@ -114,11 +115,11 @@ public class MainActivity extends Activity {
 
         String uri = uriEdit.getText().toString().trim();
         if (uri.isEmpty()) {
-            Toast.makeText(this, "先输入小程序链接", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "先输入 NFC Scheme", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!uri.contains("://")) {
-            Toast.makeText(this, "这看起来不像 URI", Toast.LENGTH_SHORT).show();
+        if (!uri.startsWith("weixin://")) {
+            Toast.makeText(this, "微信 NFC 应使用 weixin:// URL Scheme", Toast.LENGTH_SHORT).show();
             return;
         }
 
